@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Dept.xml 在com.chag.app.web.entity包中 -->
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!-- namespace 的值是EmpMapper接口 每个Mapper接口对应一个配置文件 -->
+<mapper namespace="com.chag.app.web.dao.EmpDao">
+	<!-- id对应DeptMapper接口方法名 paramater对应方法的参数类型 #{deptno}对应参数的Bean属性，就是方法getDeptno() -->
+	<insert id="add" parameterType="com.chag.app.web.entity.Emp">
+		<!-- keyProperty: Bean ID的属性名 order:是在insert语句执行之前 resultType:是属性的数据类型 -->
+		<selectKey keyProperty="empno" order="BEFORE" resultType="java.lang.Integer">
+			select SEQ_EMPNO.NEXTVAL from DUAL
+		</selectKey>
+		<!-- 空值处理 -->
+		insert into emp values
+		(SEQ_EMPNO.CURRVAL,
+		#{ename,jdbcType=VARCHAR},
+		#{job,jdbcType=VARCHAR},
+		#{mgr,jdbcType=INTEGER},
+		#{hiredate,jdbcType=TIMESTAMP},
+		#{sal,jdbcType=DOUBLE},
+		#{comm,jdbcType=DOUBLE},
+		#{deptno,jdbcType=INTEGER})
+	</insert>
+
+	<select id="findById" parameterType="int"
+		resultType="com.chag.app.web.entity.Emp">
+		select e.empno, e.ename, e.job, e.mgr, e.hiredate, e.sal,
+		e.comm,
+		e.deptno
+		from emp e where
+		<!-- 空值处理 -->
+		e.empno = #{empno,jdbcType=INTEGER}
+	</select>
+
+	<select id="findAll" resultType="com.chag.app.web.entity.Emp">
+		select e.empno, e.ename, e.job,
+		e.mgr,
+		e.hiredate, e.sal,
+		e.comm, e.deptno
+		from emp e order by
+		e.hiredate
+	</select>
+
+	<delete id="deleteById" parameterType="int">
+		delete from emp e where
+		<!-- 空值处理 -->
+		e.empno = #{empno,jdbcType=INTEGER}
+	</delete>
+
+	<update id="update" parameterType="com.chag.app.web.entity.Emp">
+		<!-- 空值处理 -->
+		update emp e set
+		e.ename =#{ename,jdbcType=VARCHAR},
+		e.job =
+		#{job,jdbcType=VARCHAR},
+		e.mgr = #{mgr,jdbcType=INTEGER},
+		e.hiredate =
+		#{hiredate,jdbcType=TIMESTAMP},
+		e.sal = #{sal,jdbcType=DOUBLE},
+		e.comm =
+		#{comm,jdbcType=DOUBLE},
+		e.deptno = #{deptno,jdbcType=INTEGER}
+		where
+		e.empno = #{empno,jdbcType=INTEGER}
+	</update>
+
+	<select id="findRows" resultType="int"
+		parameterType="com.chag.app.web.entity.page.EmpPage">
+		select count(*) from emp e
+		<where>
+			<if test="ename!=null &amp;&amp; ename.length()>0">
+				and e.ename like '%'||#{ename}||'%'
+			</if>
+			<if test="job!=null &amp;&amp; job.length()>0">
+				and e.job like '%'||#{job}||'%'
+			</if>
+			<if test="mgr!=null">
+				and e.mgr=#{mgr}
+			</if>
+			<if test='deptno!=null &amp;&amp; !deptno.equals("-1")'>
+				and e.deptno=#{deptno}
+			</if>
+		</where>
+	</select>
+
+	<select id="findByPage" parameterType="com.chag.app.web.entity.page.EmpPage"
+		resultType="com.chag.app.web.entity.Emp">
+		select * from(
+		select e1.*, rownum rn from(
+		select e.empno, e.ename,
+		e.job, e.mgr, e.hiredate, e.sal, e.comm, e.deptno from emp e
+		<where>
+			<if test="ename!=null &amp;&amp; ename.length()>0">
+				and e.ename like '%'||#{ename}||'%'
+			</if>
+			<if test="job!=null &amp;&amp; job.length()>0">
+				and e.job like '%'||#{job}||'%'
+			</if>
+			<if test="mgr!=null">
+				and e.mgr=#{mgr}
+			</if>
+			<if test='deptno!=null &amp;&amp; !deptno.equals("-1")'>
+				and e.deptno=#{deptno}
+			</if>
+		</where>
+		order by e.hiredate
+		)
+		e1)
+		e2 where e2.rn between #{begin} and #{end}
+	</select>
+</mapper>
+
+
+
+
+
+
+

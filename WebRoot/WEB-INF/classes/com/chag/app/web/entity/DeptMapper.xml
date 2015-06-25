@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Dept.xml 在com.chag.app.web.entity包中 -->
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!-- namespace 的值是EmpMapper接口 每个Mapper接口对应一个配置文件 -->
+<mapper namespace="com.chag.app.web.dao.DeptDao">
+	<!-- id对应DeptMapper接口方法名 paramater对应方法的参数类型 #{deptno}对应参数的Bean属性，就是方法getDeptno() -->
+	<insert id="add" parameterType="com.chag.app.web.entity.Dept">
+		<!-- keyProperty: Bean ID的属性名 order:是在insert语句执行之前 resultType:是属性的数据类型 -->
+		<selectKey keyProperty="deptno" order="BEFORE" resultType="java.lang.Integer">
+			SELECT SEQ_DEPTNO.NEXTVAL FROM DUAL
+		</selectKey>
+			<!-- 空值处理 -->
+			INSERT INTO DEPT VALUES(SEQ_DEPTNO.CURRVAL, #{dname,jdbcType=VARCHAR}, #{loc,jdbcType=VARCHAR})
+	</insert>
+
+	<select id="findById" parameterType="int" resultType="com.chag.app.web.entity.Dept">
+		SELECT D.DEPTNO, D.DNAME, D.LOC FROM DEPT D WHERE D.DEPTNO = #{deptno,jdbcType=INTEGER}
+	</select>
+
+	<select id="findAll" resultType="com.chag.app.web.entity.Dept">
+		SELECT D.DEPTNO, D.DNAME, D.LOC FROM DEPT D ORDER BY D.DEPTNO
+	</select>
+
+	<delete id="deleteById" parameterType="int">
+		DELETE FROM DEPT D WHERE D.DEPTNO = #{deptno, jdbcType=INTEGER}
+	</delete>
+
+	<update id="update" parameterType="com.chag.app.web.entity.Dept">
+		UPDATE DEPT D SET D.DNAME = #{dname, jdbcType=VARCHAR}, D.LOC = #{loc, jdbcType=VARCHAR}
+			WHERE D.DEPTNO = #{deptno, jdbcType=INTEGER}
+	</update>
+</mapper>
+
+
+
+
+
+
+
